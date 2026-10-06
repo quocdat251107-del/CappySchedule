@@ -1,6 +1,7 @@
 package com.cappy.schedule.listener;
 
 import com.cappy.schedule.CappySchedulePlugin;
+import io.lumine.mythic.bukkit.events.MythicMobSpawnEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,6 +25,13 @@ public class SpawnProtectionBypassListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
     public void onEntitySpawn(EntitySpawnEvent event) {
+        if (event.isCancelled() && plugin.getScheduleManager().isWorldGuardBypassing()) {
+            event.setCancelled(false);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+    public void onMythicMobSpawn(MythicMobSpawnEvent event) {
         if (event.isCancelled() && plugin.getScheduleManager().isWorldGuardBypassing()) {
             event.setCancelled(false);
         }

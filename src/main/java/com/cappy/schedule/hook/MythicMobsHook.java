@@ -45,6 +45,20 @@ public class MythicMobsHook implements MobHook {
                     living.setRemoveWhenFarAway(false);
                 }
                 return bEntity;
+            } else {
+                Bukkit.getLogger().info("[CappySchedule] Direct API spawn returned null for '" + schedule.getMobId() + "', executing forced command fallback...");
+                int level = (int) Math.max(1, schedule.getLevel());
+                String cmd = String.format("mm mobs spawn %s:%d 1 %s,%f,%f,%f,%f,%f",
+                        schedule.getMobId(),
+                        level,
+                        location.getWorld().getName(),
+                        location.getX(),
+                        location.getY(),
+                        location.getZ(),
+                        location.getYaw(),
+                        location.getPitch()
+                );
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
             }
         } catch (Throwable t) {
             Bukkit.getLogger().warning("[CappySchedule] Error spawning MythicMob '" + schedule.getMobId() + "': " + t.getMessage());

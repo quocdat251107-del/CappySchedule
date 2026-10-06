@@ -52,7 +52,15 @@ public final class LocationUtil {
         int initialY = loc.getBlockY();
         int z = loc.getBlockZ();
 
-        // Search down up to 20 blocks or up 10 blocks for solid ground
+        // If the specified location is already on solid ground with air above, keep exact position
+        Block current = world.getBlockAt(x, initialY, z);
+        Block currentBelow = world.getBlockAt(x, initialY - 1, z);
+        Block currentAbove = world.getBlockAt(x, initialY + 1, z);
+        if (currentBelow.getType().isSolid() && !current.getType().isSolid() && !currentAbove.getType().isSolid()) {
+            return loc;
+        }
+
+        // Search down up to 30 blocks for solid ground
         for (int y = initialY; y >= Math.max(world.getMinHeight(), initialY - 30); y--) {
             Block block = world.getBlockAt(x, y, z);
             Block above1 = world.getBlockAt(x, y + 1, z);
