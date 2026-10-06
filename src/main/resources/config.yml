@@ -17,6 +17,10 @@ scheduler-tick-interval: 20
 # Global Prefix for Chat Messages
 prefix: "&#FF8C00[&#FFA500CappySchedule&#FF8C00]&r "
 
+# Bỏ qua cấm spawn quái của WorldGuard (mob-spawning deny trong region)
+# Khi bật (true), toàn bộ quái do plugin này lên lịch sẽ luôn xuất hiện kể cả khi region WorldGuard cấm spawn mob.
+ignore-worldguard: true
+
 # Default Sound settings
 sounds:
   warning: "BLOCK_NOTE_BLOCK_PLING:1.0:1.5"
@@ -50,6 +54,8 @@ schedules:
         pitch: 0.0
         radius: 0.0
         safe_spawn: true
+    # Bỏ qua cấm spawn của WorldGuard cho riêng boss này (true/false)
+    ignore_worldguard: true
     prevent_stacking: true
     despawn_after_seconds: 3600
     warnings:

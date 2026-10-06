@@ -32,6 +32,7 @@ public final class CappySchedulePlugin extends JavaPlugin {
 
         // Register listeners
         getServer().getPluginManager().registerEvents(new MobDeathListener(this), this);
+        getServer().getPluginManager().registerEvents(new com.cappy.schedule.listener.SpawnProtectionBypassListener(this), this);
 
         // Register command
         PluginCommand cmd = getCommand("cappyschedule");

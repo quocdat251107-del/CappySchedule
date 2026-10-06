@@ -136,6 +136,7 @@ public class PluginConfig {
             }
 
             boolean preventStacking = s.getBoolean("prevent_stacking", true);
+            boolean ignoreWorldGuard = s.getBoolean("ignore_worldguard", config.getBoolean("ignore-worldguard", true));
             long despawnAfterSeconds = s.getLong("despawn_after_seconds", 0L);
 
             // Warnings
@@ -200,7 +201,7 @@ public class PluginConfig {
             MobSchedule schedule = new MobSchedule(
                     key, enabled, displayName, provider, mobId, level,
                     times, days, intervalSeconds, locations, preventStacking,
-                    despawnAfterSeconds, warnings, onSpawn, onKill, onDespawn
+                    ignoreWorldGuard, despawnAfterSeconds, warnings, onSpawn, onKill, onDespawn
             );
 
             schedules.put(key.toLowerCase(), schedule);
@@ -246,6 +247,10 @@ public class PluginConfig {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public boolean isIgnoreWorldGuard() {
+        return plugin.getConfig().getBoolean("ignore-worldguard", true);
     }
 
     public Map<String, MobSchedule> getSchedules() {

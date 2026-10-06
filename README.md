@@ -23,6 +23,8 @@
   - Hỗ trợ đa thế giới (Multi-World).
   - Tự động tìm bề mặt an toàn (`safe_spawn: true`).
   - Bán kính triệu hồi ngẫu nhiên (`radius`).
+- 🛡️ **Bỏ qua cấm Spawn của WorldGuard (WorldGuard Bypass)**:
+  - `ignore-worldguard: true`: Cho phép triệu hồi Boss ngay cả trong các Region WorldGuard đã bật cờ cấm quái (`mob-spawning: deny`).
 - 🛡️ **Chống dồn Boss & Tự biến mất (Despawn Timer)**:
   - `prevent_stacking: true`: Không spawn thêm boss nếu boss trước đó vẫn chưa bị tiêu diệt.
   - `despawn_after_seconds`: Tự động biến mất sau X giây nếu không có ai khiêu chiến.
@@ -38,7 +40,7 @@
 | :--- | :--- |
 | **Minecraft Server** | Spigot / Paper / Purpur **1.20.x đến 1.21.x** (hoặc mới hơn) |
 | **Java Runtime** | Java **17** hoặc **Java 21+** |
-| **Plugins hỗ trợ (Tùy chọn)** | [MythicMobs](https://mythiccraft.io/) (v5.x), [EliteMobs](https://www.spigotmc.org/resources/elitemobs.40090/), [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) |
+| **Plugins hỗ trợ (Tùy chọn)** | [WorldGuard](https://enginehub.org/worldguard), [MythicMobs](https://mythiccraft.io/) (v5.x), [EliteMobs](https://www.spigotmc.org/resources/elitemobs.40090/), [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) |
 
 ---
 

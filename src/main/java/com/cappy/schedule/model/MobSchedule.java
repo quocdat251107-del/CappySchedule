@@ -20,6 +20,7 @@ public class MobSchedule {
     private final Long intervalSeconds;
     private final List<SpawnLocation> locations;
     private final boolean preventStacking;
+    private final boolean ignoreWorldGuard;
     private final long despawnAfterSeconds;
     private final List<WarningConfig> warnings;
     private final SpawnAction onSpawn;
@@ -29,7 +30,7 @@ public class MobSchedule {
     public MobSchedule(String id, boolean enabled, String displayName, MobProvider provider,
                        String mobId, double level, List<LocalTime> times, Set<DayOfWeek> days,
                        Long intervalSeconds, List<SpawnLocation> locations, boolean preventStacking,
-                       long despawnAfterSeconds, List<WarningConfig> warnings,
+                       boolean ignoreWorldGuard, long despawnAfterSeconds, List<WarningConfig> warnings,
                        SpawnAction onSpawn, KillAction onKill, DespawnAction onDespawn) {
         this.id = id;
         this.enabled = enabled;
@@ -42,6 +43,7 @@ public class MobSchedule {
         this.intervalSeconds = intervalSeconds;
         this.locations = locations != null ? locations : Collections.emptyList();
         this.preventStacking = preventStacking;
+        this.ignoreWorldGuard = ignoreWorldGuard;
         this.despawnAfterSeconds = despawnAfterSeconds;
         this.warnings = warnings != null ? warnings : Collections.emptyList();
         this.onSpawn = onSpawn;
@@ -97,6 +99,10 @@ public class MobSchedule {
 
     public boolean isPreventStacking() {
         return preventStacking;
+    }
+
+    public boolean isIgnoreWorldGuard() {
+        return ignoreWorldGuard;
     }
 
     public long getDespawnAfterSeconds() {

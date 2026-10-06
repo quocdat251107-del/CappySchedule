@@ -118,6 +118,16 @@ public class ScheduleManager {
         }
     }
 
+    private final java.util.concurrent.atomic.AtomicBoolean worldGuardBypassing = new java.util.concurrent.atomic.AtomicBoolean(false);
+
+    public boolean isWorldGuardBypassing() {
+        return worldGuardBypassing.get();
+    }
+
+    public void setWorldGuardBypassing(boolean bypassing) {
+        this.worldGuardBypassing.set(bypassing);
+    }
+
     public boolean triggerSchedule(MobSchedule schedule, boolean force) {
         if (schedule == null || (!schedule.isEnabled() && !force)) {
             return false;
@@ -144,8 +154,21 @@ public class ScheduleManager {
             return false;
         }
 
-        // Spawn mob through hook
-        Entity spawnedEntity = plugin.getHookManager().spawn(schedule, loc);
+        // Spawn mob through hook with WorldGuard bypass
+        boolean bypassWG = schedule.isIgnoreWorldGuard() || plugin.getPluginConfig().isIgnoreWorldGuard();
+        if (bypassWG) {
+            setWorldGuardBypassing(true);
+        }
+
+        Entity spawnedEntity = null;
+        try {
+            spawnedEntity = plugin.getHookManager().spawn(schedule, loc);
+        } finally {
+            if (bypassWG) {
+                setWorldGuardBypassing(false);
+            }
+        }
+
         ActiveMobInstance instance = null;
         if (spawnedEntity != null) {
             instance = new ActiveMobInstance(schedule.getId(), spawnedEntity.getUniqueId(), loc);
