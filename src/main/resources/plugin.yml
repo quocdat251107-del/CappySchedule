@@ -1,5 +1,5 @@
 name: CappySchedule
-version: 1.0.1
+version: 1.0.2
 main: com.cappy.schedule.CappySchedulePlugin
 api-version: '1.20'
 author: CappyTeam
