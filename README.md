@@ -46,7 +46,7 @@
 
 ## 🛠️ Hướng Dẫn Cài Đặt
 
-1. Tải tệp `CappySchedule-1.0.3.jar` từ thư mục [`build/libs/CappySchedule-1.0.3.jar`](build/libs/CappySchedule-1.0.3.jar).
+1. Tải tệp `CappySchedule-1.0.4.jar` từ thư mục [`build/libs/CappySchedule-1.0.4.jar`](build/libs/CappySchedule-1.0.4.jar).
 2. Đặt file jar vào thư mục `plugins/` của máy chủ Minecraft.
 3. Khởi động lại máy chủ hoặc nạp plugin qua PlugMan.
 4. Chỉnh sửa cấu hình trong `plugins/CappySchedule/config.yml` và `messages.yml`.

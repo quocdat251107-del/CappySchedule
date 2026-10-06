@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'com.cappy.schedule'
-version = '1.0.3'
+version = '1.0.4'
 description = 'CappySchedule - Automated Mob Spawning Scheduler with Timezone support'
 
 java {
