@@ -99,16 +99,20 @@ public class ScheduleManager {
                 }
             }
 
-            // Check Trigger / Spawn (within 1 second window)
-            if (secondsUntilRun <= 0 && secondsUntilRun >= -2) {
-                // If it's interval based, update interval tracker
-                if (schedule.getIntervalSeconds() != null) {
-                    intervalLastRun.put(schedule.getId(), System.currentTimeMillis());
+            // Check Trigger / Spawn (Trigger when now is at or past scheduled time within 60s window)
+            if (nowEpochSec >= nextRunEpochSec) {
+                if (nowEpochSec <= nextRunEpochSec + 60) {
+                    if (schedule.getIntervalSeconds() != null) {
+                        intervalLastRun.put(schedule.getId(), System.currentTimeMillis());
+                    }
+                    nextRunCache.remove(schedule.getId());
+                    fired.clear();
+                    triggerSchedule(schedule, false);
+                } else {
+                    // Missed window by more than 60s, advance to next schedule cycle
+                    nextRunCache.remove(schedule.getId());
+                    fired.clear();
                 }
-                // Invalidate cache so next cycle is calculated
-                nextRunCache.remove(schedule.getId());
-                fired.clear();
-                triggerSchedule(schedule, false);
             }
         }
 
@@ -154,6 +158,14 @@ public class ScheduleManager {
             return false;
         }
 
+        if (loc != null && loc.getWorld() != null) {
+            plugin.getLogger().info(String.format("[CappySchedule] Spawning '%s' [%s] at %s (%.1f, %.1f, %.1f)...",
+                    schedule.getId(),
+                    schedule.getProvider().name(),
+                    loc.getWorld().getName(),
+                    loc.getX(), loc.getY(), loc.getZ()));
+        }
+
         // Spawn mob through hook with WorldGuard bypass
         boolean bypassWG = schedule.isIgnoreWorldGuard() || plugin.getPluginConfig().isIgnoreWorldGuard();
         if (bypassWG) {
@@ -173,6 +185,9 @@ public class ScheduleManager {
         if (spawnedEntity != null) {
             instance = new ActiveMobInstance(schedule.getId(), spawnedEntity.getUniqueId(), loc);
             activeMobs.computeIfAbsent(schedule.getId(), k -> new ArrayList<>()).add(instance);
+            plugin.getLogger().info("[CappySchedule] Successfully spawned mob for '" + schedule.getId() + "' (UUID: " + spawnedEntity.getUniqueId() + ")!");
+        } else {
+            plugin.getLogger().info("[CappySchedule] Spawn executed for '" + schedule.getId() + "'.");
         }
 
         // Handle auto-despawn timer

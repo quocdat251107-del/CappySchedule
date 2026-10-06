@@ -60,7 +60,33 @@ public class SpawnLocation {
 
     public Location toBukkitLocation() {
         World world = Bukkit.getWorld(worldName);
-        if (world == null) return null;
+        if (world == null) {
+            for (World w : Bukkit.getWorlds()) {
+                if (w.getName().equalsIgnoreCase(worldName)) {
+                    world = w;
+                    break;
+                }
+            }
+        }
+
+        if (world == null) {
+            try {
+                world = Bukkit.createWorld(new org.bukkit.WorldCreator(worldName));
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (world == null) {
+            Bukkit.getLogger().warning("[CappySchedule] World '" + worldName + "' could not be found or loaded!");
+            return null;
+        }
+
+        int chunkX = ((int) x) >> 4;
+        int chunkZ = ((int) z) >> 4;
+        if (!world.isChunkLoaded(chunkX, chunkZ)) {
+            world.loadChunk(chunkX, chunkZ, true);
+        }
+
         Location base = new Location(world, x, y, z, yaw, pitch);
         return LocationUtil.getComputedLocation(base, radius, safeSpawn);
     }

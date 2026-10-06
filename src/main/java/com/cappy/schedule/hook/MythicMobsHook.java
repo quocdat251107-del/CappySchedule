@@ -40,14 +40,20 @@ public class MythicMobsHook implements MobHook {
 
             ActiveMob activeMob = mob.spawn(BukkitAdapter.adapt(location), Math.max(1, schedule.getLevel()));
             if (activeMob != null && activeMob.getEntity() != null) {
-                return Bukkit.getEntity(activeMob.getEntity().getUniqueId());
+                Entity bEntity = Bukkit.getEntity(activeMob.getEntity().getUniqueId());
+                if (bEntity instanceof org.bukkit.entity.LivingEntity living) {
+                    living.setRemoveWhenFarAway(false);
+                }
+                return bEntity;
             }
         } catch (Throwable t) {
             Bukkit.getLogger().warning("[CappySchedule] Error spawning MythicMob '" + schedule.getMobId() + "': " + t.getMessage());
             // Fallback command execution
             try {
-                String cmd = String.format("mm mobs spawn %s 1 %s,%f,%f,%f,%f,%f",
+                int level = (int) Math.max(1, schedule.getLevel());
+                String cmd = String.format("mm mobs spawn %s:%d 1 %s,%f,%f,%f,%f,%f",
                         schedule.getMobId(),
+                        level,
                         location.getWorld().getName(),
                         location.getX(),
                         location.getY(),
