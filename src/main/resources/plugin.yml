@@ -1,0 +1,45 @@
+name: CappySchedule
+version: 1.0.0
+main: com.cappy.schedule.CappySchedulePlugin
+api-version: '1.20'
+author: CappyTeam
+description: Advanced Mob Spawning Scheduler with Timezone & Pre-Spawn Countdown support.
+softdepend:
+  - MythicMobs
+  - EliteMobs
+  - PlaceholderAPI
+
+commands:
+  cappyschedule:
+    description: Main command for CappySchedule
+    aliases: [cs, cschedule, cappys]
+    permission: cappyschedule.use
+    usage: /<command> [help|reload|list|trigger|next|time]
+
+permissions:
+  cappyschedule.use:
+    description: Allows using basic player commands (/cs next, /cs time)
+    default: true
+  cappyschedule.admin:
+    description: Full administrative access to CappySchedule
+    default: op
+    children:
+      cappyschedule.admin.reload: true
+      cappyschedule.admin.list: true
+      cappyschedule.admin.trigger: true
+  cappyschedule.admin.reload:
+    description: Allows reloading plugin configuration
+    default: op
+  cappyschedule.admin.list:
+    description: Allows listing all schedules
+    default: op
+  cappyschedule.admin.trigger:
+    description: Allows manually triggering a mob schedule
+    default: op
+  cappyschedule.player.next:
+    description: Allows checking the next upcoming mob spawns
+    default: true
+  cappyschedule.player.time:
+    description: Allows checking server time in configured timezone
+    default: true
+

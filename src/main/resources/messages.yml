@@ -1,0 +1,33 @@
+# ==============================================================================
+#                       CAPPY SCHEDULE - MESSAGES
+# ==============================================================================
+
+no-permission: "{prefix}&cBạn không có quyền sử dụng lệnh này!"
+reloaded: "{prefix}&aĐã tải lại cấu hình và lịch trình thành công! (&e{count} &alịch trình đang kích hoạt)"
+invalid-command: "{prefix}&cLệnh không hợp lệ! Sử dụng &e/cappyschedule help &cđể xem hướng dẫn."
+schedule-not-found: "{prefix}&cKhông tìm thấy lịch trình có ID: &e{id}"
+schedule-triggered: "{prefix}&aĐã kích hoạt thủ công lịch trình &e{name} &athành công!"
+schedule-disabled: "{prefix}&cKhông thể kích hoạt vì lịch trình &e{id} &ađang bị tắt."
+stack-prevented: "{prefix}&cKhông thể spawn &e{name} &cvì phiên bản trước đó vẫn còn sống!"
+world-not-found: "{prefix}&cThế giới &e{world} &ckhông tồn tại hoặc chưa được nạp!"
+
+help-header: "&#FFA500====== [ &#FF8C00CappySchedule Trợ Giúp &#FFA500] ======"
+help-next: "&e/cs next &7- Xem danh sách các boss/mob sắp xuất hiện"
+help-time: "&e/cs time &7- Xem thời gian máy chủ theo múi giờ cấu hình"
+help-list: "&e/cs list &7- [Admin] Danh sách tất cả lịch trình và trạng thái"
+help-trigger: "&e/cs trigger <id> &7- [Admin] Kích hoạt ngay một lịch trình"
+help-reload: "&e/cs reload &7- [Admin] Tải lại toàn bộ cấu hình"
+
+time-info: "{prefix}&eThời gian máy chủ hiện tại (&b{timezone}&e): &a{time} &7({date})"
+
+next-header: "&#FFA500====== [ &#FF8C00LỊCH XUẤT HIỆN MOB SẮP TỚI &#FFA500] ======"
+next-item: "&6• &f{name}&7: &e{time} &7(còn &a{time_left}&7) tại &b{world}"
+next-empty: "{prefix}&7Hiện không có lịch trình mob nào sắp diễn ra."
+
+list-header: "&#FFA500====== [ &#FF8C00DANH SÁCH LỊCH TRÌNH ({count}) &#FFA500] ======"
+list-item: "&6• &e{id} &7[&f{provider}&7] - &f{name}&7: {status} &7| Kế tiếp: &a{next_time} &7| Còn sống: {alive}"
+status-enabled: "&a[BẬT]"
+status-disabled: "&c[TẮT]"
+alive-yes: "&cCó ({count})"
+alive-no: "&7Không"
+

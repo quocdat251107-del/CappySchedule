@@ -1,0 +1,207 @@
+# ==============================================================================
+#                      CAPPY SCHEDULE - CONFIGURATION FILE
+# ==============================================================================
+
+# Timezone settings
+# Examples: "Asia/Ho_Chi_Minh", "GMT+7", "UTC", "America/New_York", "Europe/London", "Asia/Tokyo"
+timezone: "Asia/Ho_Chi_Minh"
+
+# Date and Time display formatting
+time-format: "HH:mm:ss"
+date-format: "yyyy-MM-dd"
+datetime-format: "yyyy-MM-dd HH:mm:ss"
+
+# Check interval in ticks (20 ticks = 1 second). Default: 20 ticks (1s)
+scheduler-tick-interval: 20
+
+# Global Prefix for Chat Messages
+prefix: "&#FF8C00[&#FFA500CappySchedule&#FF8C00]&r "
+
+# Default Sound settings
+sounds:
+  warning: "BLOCK_NOTE_BLOCK_PLING:1.0:1.5"
+  spawn: "ENTITY_ENDER_DRAGON_GROWL:1.0:1.0"
+  kill: "UI_TOAST_CHALLENGE_COMPLETE:1.0:1.0"
+  despawn: "ENTITY_ENDERMAN_TELEPORT:1.0:0.5"
+
+# ==============================================================================
+#                           SCHEDULE DEFINITIONS
+# ==============================================================================
+schedules:
+  # Example 1: MythicMobs World Boss (Spawn at specific times every day)
+  world_boss_skeletor:
+    enabled: true
+    display_name: "&#FF4500&l[WORLD BOSS] Skeletor King"
+    
+    # Mob Type: MYTHICMOBS, ELITEMOBS, VANILLA, COMMAND
+    provider: "MYTHICMOBS"
+    mob_id: "SkeletorKing"
+    level: 1
+    
+    # Spawn Times in 24-hour format (HH:mm) based on configured timezone
+    times:
+      - "09:00"
+      - "14:00"
+      - "20:00"
+      - "22:30"
+      
+    # Days of the week (ALL, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)
+    days:
+      - "ALL"
+      
+    # Locations where the mob can spawn (picks randomly if multiple are defined)
+    locations:
+      - world: "world"
+        x: 100.5
+        y: 65.0
+        z: -250.5
+        yaw: 0.0
+        pitch: 0.0
+        radius: 5.0 # Random offset within radius
+        safe_spawn: true # Ensures mob spawns on top of solid ground
+        
+    # Prevent duplicate spawning if previous mob is still alive (true/false)
+    prevent_stacking: true
+    
+    # Auto despawn after X seconds if not killed (0 = never despawn)
+    despawn_after_seconds: 1800 # 30 minutes
+    
+    # Countdown announcements before spawn time
+    warnings:
+      - time_before: "10m" # 10 minutes before
+        broadcast_chat: true
+        chat_message: "{prefix}&eTrùm thế giới &f{mob_name} &esẽ xuất hiện sau &c10 phút &etại &b{world} ({x}, {y}, {z})&e!"
+        title: "&#FF5555&lCẢNH BÁO"
+        subtitle: "&eTrùm &f{mob_name} &exuất hiện sau &c10 phút&e!"
+        actionbar: "&eTrùm &f{mob_name} &esắp xuất hiện (&c10m&e)"
+        sound: "BLOCK_NOTE_BLOCK_BELL:1.0:1.0"
+        
+      - time_before: "5m"
+        broadcast_chat: true
+        chat_message: "{prefix}&eTrùm thế giới &f{mob_name} &esẽ xuất hiện sau &c5 phút &etại &b{world} ({x}, {y}, {z})&e!"
+        sound: "BLOCK_NOTE_BLOCK_BELL:1.0:1.2"
+        
+      - time_before: "1m"
+        broadcast_chat: true
+        chat_message: "{prefix}&c&lCẢNH BÁO: &f{mob_name} &csẽ xuất hiện sau &e60 giây&c!"
+        title: "&#FF0000&lCHUẨN BỊ CHIẾN ĐẤU"
+        subtitle: "&f{mob_name} &exuất hiện sau &c60 giây&e!"
+        sound: "BLOCK_NOTE_BLOCK_PLING:1.0:2.0"
+        
+      - time_before: "10s"
+        broadcast_chat: true
+        chat_message: "{prefix}&c{mob_name} &exuất hiện sau &410 giây&e!"
+        title: "&#FF0000&l10 GIÂY"
+        subtitle: "&f{mob_name} &exuất hiện!"
+        sound: "BLOCK_NOTE_BLOCK_PLING:1.0:2.0"
+
+    # Actions when the mob spawns
+    on_spawn:
+      broadcast_chat: true
+      chat_message: "{prefix}&c&l[XUẤT HIỆN] &f{mob_name} &cđã xuất hiện tại toạ độ &e[{world}: {x}, {y}, {z}]&c! Hãy mau đến tiêu diệt!"
+      title: "&#FF0000&l{mob_name}"
+      subtitle: "&eĐã xuất hiện tại &b{world}&e! Mau tiêu diệt!"
+      actionbar: "&c&l{mob_name} ĐÃ XUẤT HIỆN!"
+      sound: "ENTITY_WITHER_SPAWN:1.0:0.8"
+      spawn_fireworks: true
+      commands:
+        - "tellraw @a [{\"text\":\"[CappySchedule] Click để dịch chuyển đến vị trí boss!\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/tp 100 65 -250\"}}]"
+
+    # Actions when the mob is killed
+    on_kill:
+      broadcast_chat: true
+      chat_message: "{prefix}&a&l[CHIẾN THẮNG] &f{mob_name} &ađã bị tiêu diệt bởi dũng sĩ &e{killer}&a!"
+      title: "&#00FF00&lCHIẾN THẮNG"
+      subtitle: "&f{killer} &ađã hạ gục &e{mob_name}&a!"
+      sound: "UI_TOAST_CHALLENGE_COMPLETE:1.0:1.0"
+      commands:
+        - "eco give {killer} 5000"
+
+    # Actions if the mob despawns due to timeout
+    on_despawn:
+      broadcast_chat: true
+      chat_message: "{prefix}&7{mob_name} &7đã biến mất vì không ai đến khiêu chiến!"
+      sound: "ENTITY_ENDERMAN_TELEPORT:1.0:0.5"
+
+  # Example 2: EliteMobs Boss (Spawned on weekends at 21:00)
+  weekend_elitemob_boss:
+    enabled: true
+    display_name: "&#00FFFF&l[ELITE BOSS] Băng Long Thần"
+    provider: "ELITEMOBS"
+    mob_id: "frost_dragon_boss.yml" # Or custom boss file/id
+    level: 50
+    times:
+      - "21:00"
+    days:
+      - "SATURDAY"
+      - "SUNDAY"
+    locations:
+      - world: "world"
+        x: -500.0
+        y: 80.0
+        z: 320.0
+        radius: 0.0
+        safe_spawn: true
+    prevent_stacking: true
+    despawn_after_seconds: 3600
+    warnings:
+      - time_before: "5m"
+        broadcast_chat: true
+        chat_message: "{prefix}&b[EliteBoss] &f{mob_name} &bsẽ thức tỉnh sau &c5 phút&b!"
+        sound: "BLOCK_NOTE_BLOCK_PLING:1.0:1.0"
+      - time_before: "1m"
+        broadcast_chat: true
+        chat_message: "{prefix}&b[EliteBoss] &f{mob_name} &bsẽ thức tỉnh sau &c1 phút&b!"
+        sound: "BLOCK_NOTE_BLOCK_BELL:1.0:1.5"
+    on_spawn:
+      broadcast_chat: true
+      chat_message: "{prefix}&b&l[EliteBoss] &f{mob_name} &bđã thức tỉnh tại &e[{world}: {x}, {y}, {z}]&b!"
+      title: "&#00FFFF&l{mob_name}"
+      subtitle: "&bĐã thức tỉnh!"
+      sound: "ENTITY_ENDER_DRAGON_GROWL:1.0:0.9"
+
+  # Example 3: Vanilla Mob with Custom Name & Repeating Interval (Every 3 hours)
+  interval_giant_zombie:
+    enabled: true
+    display_name: "&#2E8B57&l[MINI BOSS] Khổng Lồ Đột Biến"
+    provider: "VANILLA"
+    mob_id: "GIANT" # Bukkit EntityType (ZOMBIE, GIANT, WITHER, SKELETON, etc.)
+    # Repeating interval format: "every: 3h" or "every: 30m"
+    interval: "every: 3h"
+    locations:
+      - world: "world"
+        x: 0.0
+        y: 70.0
+        z: 0.0
+        radius: 20.0
+        safe_spawn: true
+    prevent_stacking: true
+    despawn_after_seconds: 1200
+    warnings:
+      - time_before: "2m"
+        broadcast_chat: true
+        chat_message: "{prefix}&2[MiniBoss] &f{mob_name} &2sẽ xuất hiện sau &e2 phút&2 tại Spawn!"
+    on_spawn:
+      broadcast_chat: true
+      chat_message: "{prefix}&2[MiniBoss] &f{mob_name} &2đã xuất hiện tại Spawn!"
+      sound: "ENTITY_ZOMBIE_AMBIENT:1.0:0.5"
+
+  # Example 4: Custom Command Scheduler (e.g. Dungeon opening event)
+  dungeon_open_event:
+    enabled: true
+    display_name: "&#FFA500&l[SỰ KIỆN] Mở Cổng Bí Cảnh"
+    provider: "COMMAND"
+    times:
+      - "19:30"
+    days:
+      - "ALL"
+    warnings:
+      - time_before: "5m"
+        broadcast_chat: true
+        chat_message: "{prefix}&eCổng Bí Cảnh sẽ mở sau &c5 phút&e!"
+    on_spawn:
+      broadcast_chat: true
+      chat_message: "{prefix}&aCổng Bí Cảnh hiện đã chính thức mở cửa! Dùng lệnh &e/dungeon join &ađể tham gia!"
+      commands:
+        - "say [Cổng Bí Cảnh] Đã mở cửa cho tất cả người chơi!"
+
