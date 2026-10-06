@@ -231,24 +231,34 @@ public class ScheduleManager {
             } catch (Exception ignored) {}
         }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        boolean hasPlayers = !Bukkit.getOnlinePlayers().isEmpty();
+
+        if (hasPlayers) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (action.isBroadcastChat() && action.getChatMessage() != null) {
+                    player.sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
+                }
+                if (action.getTitle() != null || action.getSubtitle() != null) {
+                    String title = action.getTitle() != null ? applyPlaceholders(action.getTitle(), placeholders, prefix) : "";
+                    String sub = action.getSubtitle() != null ? applyPlaceholders(action.getSubtitle(), placeholders, prefix) : "";
+                    player.sendTitle(title, sub, 10, 60, 20);
+                }
+                if (action.getActionbar() != null) {
+                    try {
+                        player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
+                                net.md_5.bungee.api.chat.TextComponent.fromLegacyText(applyPlaceholders(action.getActionbar(), placeholders, prefix)));
+                    } catch (Throwable ignored) {}
+                }
+                if (action.getSound() != null) {
+                    SoundUtil.playSound(player, action.getSound());
+                }
+            }
+        } else {
+            // Log to console if no members in server
             if (action.isBroadcastChat() && action.getChatMessage() != null) {
-                player.sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
+                Bukkit.getConsoleSender().sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
             }
-            if (action.getTitle() != null || action.getSubtitle() != null) {
-                String title = action.getTitle() != null ? applyPlaceholders(action.getTitle(), placeholders, prefix) : "";
-                String sub = action.getSubtitle() != null ? applyPlaceholders(action.getSubtitle(), placeholders, prefix) : "";
-                player.sendTitle(title, sub, 10, 60, 20);
-            }
-            if (action.getActionbar() != null) {
-                try {
-                    player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
-                            net.md_5.bungee.api.chat.TextComponent.fromLegacyText(applyPlaceholders(action.getActionbar(), placeholders, prefix)));
-                } catch (Throwable ignored) {}
-            }
-            if (action.getSound() != null) {
-                SoundUtil.playSound(player, action.getSound());
-            }
+            plugin.getLogger().info("[CappySchedule] Boss '" + schedule.getDisplayName() + "' has spawned (0 players online in server).");
         }
 
         // Commands
@@ -276,23 +286,31 @@ public class ScheduleManager {
         Map<String, String> placeholders = buildPlaceholders(schedule, loc, killer, 0);
         String prefix = plugin.getPluginConfig().getPrefix();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        boolean hasPlayers = !Bukkit.getOnlinePlayers().isEmpty();
+
+        if (hasPlayers) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (action.isBroadcastChat() && action.getChatMessage() != null) {
+                    player.sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
+                }
+                if (action.getTitle() != null || action.getSubtitle() != null) {
+                    String title = action.getTitle() != null ? applyPlaceholders(action.getTitle(), placeholders, prefix) : "";
+                    String sub = action.getSubtitle() != null ? applyPlaceholders(action.getSubtitle(), placeholders, prefix) : "";
+                    player.sendTitle(title, sub, 10, 60, 20);
+                }
+                if (action.getActionbar() != null) {
+                    try {
+                        player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
+                                net.md_5.bungee.api.chat.TextComponent.fromLegacyText(applyPlaceholders(action.getActionbar(), placeholders, prefix)));
+                    } catch (Throwable ignored) {}
+                }
+                if (action.getSound() != null) {
+                    SoundUtil.playSound(player, action.getSound());
+                }
+            }
+        } else {
             if (action.isBroadcastChat() && action.getChatMessage() != null) {
-                player.sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
-            }
-            if (action.getTitle() != null || action.getSubtitle() != null) {
-                String title = action.getTitle() != null ? applyPlaceholders(action.getTitle(), placeholders, prefix) : "";
-                String sub = action.getSubtitle() != null ? applyPlaceholders(action.getSubtitle(), placeholders, prefix) : "";
-                player.sendTitle(title, sub, 10, 60, 20);
-            }
-            if (action.getActionbar() != null) {
-                try {
-                    player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
-                            net.md_5.bungee.api.chat.TextComponent.fromLegacyText(applyPlaceholders(action.getActionbar(), placeholders, prefix)));
-                } catch (Throwable ignored) {}
-            }
-            if (action.getSound() != null) {
-                SoundUtil.playSound(player, action.getSound());
+                Bukkit.getConsoleSender().sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
             }
         }
 
@@ -320,17 +338,25 @@ public class ScheduleManager {
         Map<String, String> placeholders = buildPlaceholders(schedule, loc, null, 0);
         String prefix = plugin.getPluginConfig().getPrefix();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        boolean hasPlayers = !Bukkit.getOnlinePlayers().isEmpty();
+
+        if (hasPlayers) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (action.isBroadcastChat() && action.getChatMessage() != null) {
+                    player.sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
+                }
+                if (action.getTitle() != null || action.getSubtitle() != null) {
+                    String title = action.getTitle() != null ? applyPlaceholders(action.getTitle(), placeholders, prefix) : "";
+                    String sub = action.getSubtitle() != null ? applyPlaceholders(action.getSubtitle(), placeholders, prefix) : "";
+                    player.sendTitle(title, sub, 10, 40, 10);
+                }
+                if (action.getSound() != null) {
+                    SoundUtil.playSound(player, action.getSound());
+                }
+            }
+        } else {
             if (action.isBroadcastChat() && action.getChatMessage() != null) {
-                player.sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
-            }
-            if (action.getTitle() != null || action.getSubtitle() != null) {
-                String title = action.getTitle() != null ? applyPlaceholders(action.getTitle(), placeholders, prefix) : "";
-                String sub = action.getSubtitle() != null ? applyPlaceholders(action.getSubtitle(), placeholders, prefix) : "";
-                player.sendTitle(title, sub, 10, 40, 10);
-            }
-            if (action.getSound() != null) {
-                SoundUtil.playSound(player, action.getSound());
+                Bukkit.getConsoleSender().sendMessage(applyPlaceholders(action.getChatMessage(), placeholders, prefix));
             }
         }
 
@@ -348,23 +374,32 @@ public class ScheduleManager {
         Map<String, String> placeholders = buildPlaceholders(schedule, loc, null, secondsUntilRun);
         String prefix = plugin.getPluginConfig().getPrefix();
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        boolean hasPlayers = !Bukkit.getOnlinePlayers().isEmpty();
+
+        if (hasPlayers) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (warning.isBroadcastChat() && warning.getChatMessage() != null) {
+                    player.sendMessage(applyPlaceholders(warning.getChatMessage(), placeholders, prefix));
+                }
+                if (warning.getTitle() != null || warning.getSubtitle() != null) {
+                    String title = warning.getTitle() != null ? applyPlaceholders(warning.getTitle(), placeholders, prefix) : "";
+                    String sub = warning.getSubtitle() != null ? applyPlaceholders(warning.getSubtitle(), placeholders, prefix) : "";
+                    player.sendTitle(title, sub, 10, 50, 15);
+                }
+                if (warning.getActionbar() != null) {
+                    try {
+                        player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
+                                net.md_5.bungee.api.chat.TextComponent.fromLegacyText(applyPlaceholders(warning.getActionbar(), placeholders, prefix)));
+                    } catch (Throwable ignored) {}
+                }
+                if (warning.getSound() != null) {
+                    SoundUtil.playSound(player, warning.getSound());
+                }
+            }
+        } else {
+            // If server has no members online, log warning to console
             if (warning.isBroadcastChat() && warning.getChatMessage() != null) {
-                player.sendMessage(applyPlaceholders(warning.getChatMessage(), placeholders, prefix));
-            }
-            if (warning.getTitle() != null || warning.getSubtitle() != null) {
-                String title = warning.getTitle() != null ? applyPlaceholders(warning.getTitle(), placeholders, prefix) : "";
-                String sub = warning.getSubtitle() != null ? applyPlaceholders(warning.getSubtitle(), placeholders, prefix) : "";
-                player.sendTitle(title, sub, 10, 50, 15);
-            }
-            if (warning.getActionbar() != null) {
-                try {
-                    player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
-                            net.md_5.bungee.api.chat.TextComponent.fromLegacyText(applyPlaceholders(warning.getActionbar(), placeholders, prefix)));
-                } catch (Throwable ignored) {}
-            }
-            if (warning.getSound() != null) {
-                SoundUtil.playSound(player, warning.getSound());
+                Bukkit.getConsoleSender().sendMessage(applyPlaceholders(warning.getChatMessage(), placeholders, prefix));
             }
         }
     }
