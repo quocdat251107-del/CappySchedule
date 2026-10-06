@@ -66,121 +66,145 @@ public class PluginConfig {
         // Load schedules
         schedules.clear();
         ConfigurationSection sec = config.getConfigurationSection("schedules");
+        
+        Set<String> keysToLoad = new HashSet<>();
+        boolean isRoot = false;
+        
         if (sec != null) {
-            for (String key : sec.getKeys(false)) {
-                ConfigurationSection s = sec.getConfigurationSection(key);
-                if (s == null) continue;
-
-                boolean enabled = s.getBoolean("enabled", true);
-                String displayName = s.getString("display_name", key);
-                MobProvider provider = MobProvider.fromString(s.getString("provider", "MYTHICMOBS"));
-                String mobId = s.getString("mob_id", key);
-                double level = s.getDouble("level", 1.0);
-
-                // Times
-                List<String> rawTimes = s.getStringList("times");
-                List<LocalTime> times = new ArrayList<>();
-                for (String t : rawTimes) {
-                    LocalTime lt = TimeParser.parseTime(t);
-                    if (lt != null) {
-                        times.add(lt);
-                    }
+            keysToLoad = sec.getKeys(false);
+        } else {
+            // Fallback: check if schedules were placed at root level
+            for (String rootKey : config.getKeys(false)) {
+                if (rootKey.equalsIgnoreCase("timezone") || rootKey.equalsIgnoreCase("time-format")
+                        || rootKey.equalsIgnoreCase("date-format") || rootKey.equalsIgnoreCase("datetime-format")
+                        || rootKey.equalsIgnoreCase("scheduler-tick-interval") || rootKey.equalsIgnoreCase("prefix")
+                        || rootKey.equalsIgnoreCase("sounds")) {
+                    continue;
                 }
-
-                // Days
-                List<String> rawDays = s.getStringList("days");
-                Set<DayOfWeek> days = TimeParser.parseDays(rawDays);
-
-                // Interval
-                String rawInterval = s.getString("interval");
-                Long intervalSeconds = TimeParser.parseIntervalSeconds(rawInterval);
-
-                // Locations
-                List<SpawnLocation> locations = new ArrayList<>();
-                List<Map<?, ?>> locList = s.getMapList("locations");
-                for (Map<?, ?> map : locList) {
-                    String world = Objects.toString(map.get("world"), "world");
-                    double x = toDouble(map.get("x"), 0.0);
-                    double y = toDouble(map.get("y"), 64.0);
-                    double z = toDouble(map.get("z"), 0.0);
-                    float yaw = (float) toDouble(map.get("yaw"), 0.0);
-                    float pitch = (float) toDouble(map.get("pitch"), 0.0);
-                    double radius = toDouble(map.get("radius"), 0.0);
-                    boolean safeSpawn = toBoolean(map.get("safe_spawn"), true);
-
-                    locations.add(new SpawnLocation(world, x, y, z, yaw, pitch, radius, safeSpawn));
+                ConfigurationSection rootSec = config.getConfigurationSection(rootKey);
+                if (rootSec != null && (rootSec.contains("provider") || rootSec.contains("times") || rootSec.contains("locations") || rootSec.contains("mob_id"))) {
+                    keysToLoad.add(rootKey);
+                    isRoot = true;
                 }
-
-                boolean preventStacking = s.getBoolean("prevent_stacking", true);
-                long despawnAfterSeconds = s.getLong("despawn_after_seconds", 0L);
-
-                // Warnings
-                List<WarningConfig> warnings = new ArrayList<>();
-                List<Map<?, ?>> rawWarnings = s.getMapList("warnings");
-                for (Map<?, ?> wMap : rawWarnings) {
-                    String timeBeforeStr = Objects.toString(wMap.get("time_before"), "1m");
-                    long secondsBefore = TimeParser.parseDurationSeconds(timeBeforeStr);
-                    boolean bChat = toBoolean(wMap.get("broadcast_chat"), true);
-                    String chatMsg = Objects.toString(wMap.get("chat_message"), null);
-                    String title = Objects.toString(wMap.get("title"), null);
-                    String subtitle = Objects.toString(wMap.get("subtitle"), null);
-                    String actionbar = Objects.toString(wMap.get("actionbar"), null);
-                    String sound = Objects.toString(wMap.get("sound"), null);
-
-                    warnings.add(new WarningConfig(secondsBefore, bChat, chatMsg, title, subtitle, actionbar, sound));
-                }
-
-                // On Spawn Action
-                ConfigurationSection spawnSec = s.getConfigurationSection("on_spawn");
-                SpawnAction onSpawn = null;
-                if (spawnSec != null) {
-                    boolean bChat = spawnSec.getBoolean("broadcast_chat", true);
-                    String chatMsg = spawnSec.getString("chat_message");
-                    String title = spawnSec.getString("title");
-                    String subtitle = spawnSec.getString("subtitle");
-                    String actionbar = spawnSec.getString("actionbar");
-                    String sound = spawnSec.getString("sound");
-                    boolean fireworks = spawnSec.getBoolean("spawn_fireworks", false);
-                    List<String> commands = spawnSec.getStringList("commands");
-                    onSpawn = new SpawnAction(bChat, chatMsg, title, subtitle, actionbar, sound, fireworks, commands);
-                }
-
-                // On Kill Action
-                ConfigurationSection killSec = s.getConfigurationSection("on_kill");
-                KillAction onKill = null;
-                if (killSec != null) {
-                    boolean bChat = killSec.getBoolean("broadcast_chat", true);
-                    String chatMsg = killSec.getString("chat_message");
-                    String title = killSec.getString("title");
-                    String subtitle = killSec.getString("subtitle");
-                    String actionbar = killSec.getString("actionbar");
-                    String sound = killSec.getString("sound");
-                    List<String> commands = killSec.getStringList("commands");
-                    onKill = new KillAction(bChat, chatMsg, title, subtitle, actionbar, sound, commands);
-                }
-
-                // On Despawn Action
-                ConfigurationSection despawnSec = s.getConfigurationSection("on_despawn");
-                DespawnAction onDespawn = null;
-                if (despawnSec != null) {
-                    boolean bChat = despawnSec.getBoolean("broadcast_chat", true);
-                    String chatMsg = despawnSec.getString("chat_message");
-                    String title = despawnSec.getString("title");
-                    String subtitle = despawnSec.getString("subtitle");
-                    String actionbar = despawnSec.getString("actionbar");
-                    String sound = despawnSec.getString("sound");
-                    List<String> commands = despawnSec.getStringList("commands");
-                    onDespawn = new DespawnAction(bChat, chatMsg, title, subtitle, actionbar, sound, commands);
-                }
-
-                MobSchedule schedule = new MobSchedule(
-                        key, enabled, displayName, provider, mobId, level,
-                        times, days, intervalSeconds, locations, preventStacking,
-                        despawnAfterSeconds, warnings, onSpawn, onKill, onDespawn
-                );
-
-                schedules.put(key.toLowerCase(), schedule);
             }
+        }
+
+        for (String key : keysToLoad) {
+            ConfigurationSection s = isRoot ? config.getConfigurationSection(key) : sec.getConfigurationSection(key);
+            if (s == null) continue;
+
+            boolean enabled = s.getBoolean("enabled", true);
+            String displayName = s.getString("display_name", key);
+            MobProvider provider = MobProvider.fromString(s.getString("provider", "MYTHICMOBS"));
+            String mobId = s.getString("mob_id", key);
+            double level = s.getDouble("level", 1.0);
+
+            // Times
+            List<String> rawTimes = s.getStringList("times");
+            List<LocalTime> times = new ArrayList<>();
+            for (String t : rawTimes) {
+                LocalTime lt = TimeParser.parseTime(t);
+                if (lt != null) {
+                    times.add(lt);
+                } else {
+                    plugin.getLogger().warning("Invalid time format in schedule '" + key + "': " + t);
+                }
+            }
+
+            // Days
+            List<String> rawDays = s.getStringList("days");
+            Set<DayOfWeek> days = TimeParser.parseDays(rawDays);
+
+            // Interval
+            String rawInterval = s.getString("interval");
+            Long intervalSeconds = TimeParser.parseIntervalSeconds(rawInterval);
+
+            // Locations
+            List<SpawnLocation> locations = new ArrayList<>();
+            List<Map<?, ?>> locList = s.getMapList("locations");
+            for (Map<?, ?> map : locList) {
+                String world = Objects.toString(map.get("world"), "world");
+                double x = toDouble(map.get("x"), 0.0);
+                double y = toDouble(map.get("y"), 64.0);
+                double z = toDouble(map.get("z"), 0.0);
+                float yaw = (float) toDouble(map.get("yaw"), 0.0);
+                float pitch = (float) toDouble(map.get("pitch"), 0.0);
+                double radius = toDouble(map.get("radius"), 0.0);
+                boolean safeSpawn = toBoolean(map.get("safe_spawn"), true);
+
+                locations.add(new SpawnLocation(world, x, y, z, yaw, pitch, radius, safeSpawn));
+            }
+
+            boolean preventStacking = s.getBoolean("prevent_stacking", true);
+            long despawnAfterSeconds = s.getLong("despawn_after_seconds", 0L);
+
+            // Warnings
+            List<WarningConfig> warnings = new ArrayList<>();
+            List<Map<?, ?>> rawWarnings = s.getMapList("warnings");
+            for (Map<?, ?> wMap : rawWarnings) {
+                String timeBeforeStr = Objects.toString(wMap.get("time_before"), "1m");
+                long secondsBefore = TimeParser.parseDurationSeconds(timeBeforeStr);
+                boolean bChat = toBoolean(wMap.get("broadcast_chat"), true);
+                String chatMsg = Objects.toString(wMap.get("chat_message"), null);
+                String title = Objects.toString(wMap.get("title"), null);
+                String subtitle = Objects.toString(wMap.get("subtitle"), null);
+                String actionbar = Objects.toString(wMap.get("actionbar"), null);
+                String sound = Objects.toString(wMap.get("sound"), null);
+
+                warnings.add(new WarningConfig(secondsBefore, bChat, chatMsg, title, subtitle, actionbar, sound));
+            }
+
+            // On Spawn Action
+            ConfigurationSection spawnSec = s.getConfigurationSection("on_spawn");
+            SpawnAction onSpawn = null;
+            if (spawnSec != null) {
+                boolean bChat = spawnSec.getBoolean("broadcast_chat", true);
+                String chatMsg = spawnSec.getString("chat_message");
+                String title = spawnSec.getString("title");
+                String subtitle = spawnSec.getString("subtitle");
+                String actionbar = spawnSec.getString("actionbar");
+                String sound = spawnSec.getString("sound");
+                boolean fireworks = spawnSec.getBoolean("spawn_fireworks", false);
+                List<String> commands = spawnSec.getStringList("commands");
+                onSpawn = new SpawnAction(bChat, chatMsg, title, subtitle, actionbar, sound, fireworks, commands);
+            }
+
+            // On Kill Action
+            ConfigurationSection killSec = s.getConfigurationSection("on_kill");
+            KillAction onKill = null;
+            if (killSec != null) {
+                boolean bChat = killSec.getBoolean("broadcast_chat", true);
+                String chatMsg = killSec.getString("chat_message");
+                String title = killSec.getString("title");
+                String subtitle = killSec.getString("subtitle");
+                String actionbar = killSec.getString("actionbar");
+                String sound = killSec.getString("sound");
+                List<String> commands = killSec.getStringList("commands");
+                onKill = new KillAction(bChat, chatMsg, title, subtitle, actionbar, sound, commands);
+            }
+
+            // On Despawn Action
+            ConfigurationSection despawnSec = s.getConfigurationSection("on_despawn");
+            DespawnAction onDespawn = null;
+            if (despawnSec != null) {
+                boolean bChat = despawnSec.getBoolean("broadcast_chat", true);
+                String chatMsg = despawnSec.getString("chat_message");
+                String title = despawnSec.getString("title");
+                String subtitle = despawnSec.getString("subtitle");
+                String actionbar = despawnSec.getString("actionbar");
+                String sound = despawnSec.getString("sound");
+                List<String> commands = despawnSec.getStringList("commands");
+                onDespawn = new DespawnAction(bChat, chatMsg, title, subtitle, actionbar, sound, commands);
+            }
+
+            MobSchedule schedule = new MobSchedule(
+                    key, enabled, displayName, provider, mobId, level,
+                    times, days, intervalSeconds, locations, preventStacking,
+                    despawnAfterSeconds, warnings, onSpawn, onKill, onDespawn
+            );
+
+            schedules.put(key.toLowerCase(), schedule);
+            plugin.getLogger().info("Loaded schedule: " + key + " [" + provider.name() + "] (" + times.size() + " times)");
         }
     }
 
