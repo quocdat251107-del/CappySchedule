@@ -28,6 +28,65 @@ sounds:
 #                           SCHEDULE DEFINITIONS
 # ==============================================================================
 schedules:
+  # Sự kiện Boss MythicMobs: Quỷ Lửa Địa Ngục
+  world_boss_quylua:
+    enabled: true
+    display_name: "&#FF0000&l[WORLD BOSS] Quỷ Lửa Địa Ngục"
+    provider: "MYTHICMOBS"
+    mob_id: "Quy_Lua"
+    level: 1
+    times:
+      - "08:00"
+      - "14:00"
+      - "20:00"
+    days:
+      - "ALL"
+    locations:
+      - world: "Dungeon"
+        x: -7.0
+        y: 93.0
+        z: -85.0
+        yaw: 0.0
+        pitch: 0.0
+        radius: 0.0
+        safe_spawn: true
+    prevent_stacking: true
+    despawn_after_seconds: 3600
+    warnings:
+      - time_before: "10m"
+        broadcast_chat: true
+        chat_message: "{prefix}&eTrùm thế giới &f{mob_name} &esẽ giáng lâm tại &b{world} &esau &c10 phút&e!"
+        title: "&#FF5555&lCẢNH BÁO"
+        subtitle: "&eTrùm &f{mob_name} &exuất hiện sau &c10 phút&e!"
+        sound: "BLOCK_NOTE_BLOCK_BELL:1.0:1.0"
+      - time_before: "5m"
+        broadcast_chat: true
+        chat_message: "{prefix}&eTrùm thế giới &f{mob_name} &esẽ giáng lâm sau &c5 phút&e!"
+        sound: "BLOCK_NOTE_BLOCK_BELL:1.0:1.2"
+      - time_before: "1m"
+        broadcast_chat: true
+        chat_message: "{prefix}&c&lCẢNH BÁO: &f{mob_name} &csẽ giáng lâm sau &e60 giây&c!"
+        title: "&#FF0000&lCHUẨN BỊ CHIẾN ĐẤU"
+        subtitle: "&f{mob_name} &exuất hiện sau &c60 giây&e!"
+        sound: "BLOCK_NOTE_BLOCK_PLING:1.0:2.0"
+    on_spawn:
+      broadcast_chat: true
+      chat_message: "{prefix}&c&l[XUẤT HIỆN] &f{mob_name} &cđã giáng trần tại &e[{world}]&c! Hỡi các dũng sĩ, hãy mau đến tiêu diệt!"
+      title: "&#FF0000&l{mob_name}"
+      subtitle: "&cĐã xuất hiện tại &e{world}&c!"
+      sound: "ENTITY_ENDER_DRAGON_GROWL:1.0:1.0"
+      spawn_fireworks: true
+      commands:
+        - "tellraw @a [{\"text\":\"[CappySchedule] Click vào đây để dịch chuyển đến Dungeon!\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/tp -7 93 -85\"}}]"
+    on_kill:
+      broadcast_chat: true
+      chat_message: "{prefix}&a&l[CHIẾN THẮNG] &f{mob_name} &ađã bị phong ấn bởi tổ đội của dũng sĩ &e{killer}&a!"
+      title: "&#00FF00&lCHIẾN THẮNG"
+      subtitle: "&f{killer} &ađã hạ gục &e{mob_name}&a!"
+      sound: "UI_TOAST_CHALLENGE_COMPLETE:1.0:1.0"
+      commands:
+        - "eco give {killer} 5000"
+
   # Example 1: MythicMobs World Boss (Spawn at specific times every day)
   world_boss_skeletor:
     enabled: true

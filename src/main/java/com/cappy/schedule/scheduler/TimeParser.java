@@ -23,13 +23,24 @@ public final class TimeParser {
     public static LocalTime parseTime(String str) {
         if (str == null || str.trim().isEmpty()) return null;
         str = str.trim();
+        if ((str.startsWith("\"") && str.endsWith("\"")) || (str.startsWith("'") && str.endsWith("'"))) {
+            str = str.substring(1, str.length() - 1).trim();
+        }
+
         try {
-            if (str.split(":").length == 3) {
-                return LocalTime.parse(str, TIME_FORMAT_SHORT_SS);
-            } else {
-                return LocalTime.parse(str, TIME_FORMAT_SHORT);
+            String[] parts = str.split(":");
+            if (parts.length >= 2) {
+                int hour = Integer.parseInt(parts[0].trim());
+                int minute = Integer.parseInt(parts[1].trim());
+                int second = parts.length >= 3 ? Integer.parseInt(parts[2].trim()) : 0;
+                return LocalTime.of(hour, minute, second);
             }
-        } catch (DateTimeParseException e) {
+        } catch (Exception ignored) {
+        }
+
+        try {
+            return LocalTime.parse(str);
+        } catch (Exception ignored) {
             return null;
         }
     }

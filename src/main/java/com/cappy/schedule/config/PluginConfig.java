@@ -6,7 +6,9 @@ import com.cappy.schedule.scheduler.TimeParser;
 import com.cappy.schedule.util.ColorUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -31,9 +33,14 @@ public class PluginConfig {
     }
 
     public void load() {
-        plugin.saveDefaultConfig();
-        plugin.reloadConfig();
-        FileConfiguration config = plugin.getConfig();
+        if (!plugin.getDataFolder().exists()) {
+            plugin.getDataFolder().mkdirs();
+        }
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            plugin.saveResource("config.yml", false);
+        }
+        FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
         // Timezone
         String tzStr = config.getString("timezone", "Asia/Ho_Chi_Minh");
