@@ -107,13 +107,18 @@ schedules:
       commands:
         - "tellraw @a [{\"text\":\"[CappySchedule] Click để dịch chuyển đến vị trí boss!\",\"color\":\"gold\",\"clickEvent\":{\"action\":\"suggest_command\",\"value\":\"/tp 100 65 -250\"}}]"
 
-    # Actions when the mob is killed
+    # Actions when the mob is killed (Tùy chọn)
+    # LƯU Ý: Nếu MythicMobs / EliteMobs đã có sẵn phần thưởng (Drops, DropTables, Exp),
+    # chúng vẫn rơi và hoạt động bình thường 100%.
+    # Mục on_kill ở đây chỉ dùng để bổ sung thông báo toàn server hoặc lệnh thưởng thêm (vd: Vault eco).
+    # Nếu chỉ muốn dùng phần thưởng có sẵn của MythicMobs, bạn có thể để 'commands: []' hoặc xóa hẳn khối on_kill này.
     on_kill:
       broadcast_chat: true
       chat_message: "{prefix}&a&l[CHIẾN THẮNG] &f{mob_name} &ađã bị tiêu diệt bởi dũng sĩ &e{killer}&a!"
       title: "&#00FF00&lCHIẾN THẮNG"
       subtitle: "&f{killer} &ađã hạ gục &e{mob_name}&a!"
       sound: "UI_TOAST_CHALLENGE_COMPLETE:1.0:1.0"
+      # Danh sách lệnh thưởng thêm qua console (Để 'commands: []' nếu không cần)
       commands:
         - "eco give {killer} 5000"
 
