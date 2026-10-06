@@ -42,6 +42,12 @@ public final class LocationUtil {
         World world = loc.getWorld();
         if (world == null) return loc;
 
+        int chunkX = loc.getBlockX() >> 4;
+        int chunkZ = loc.getBlockZ() >> 4;
+        if (!world.isChunkLoaded(chunkX, chunkZ)) {
+            world.loadChunk(chunkX, chunkZ, true);
+        }
+
         int x = loc.getBlockX();
         int initialY = loc.getBlockY();
         int z = loc.getBlockZ();

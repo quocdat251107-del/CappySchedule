@@ -26,12 +26,15 @@ public class ScheduleManager {
     // Track active mob instances per schedule ID: scheduleId -> List<ActiveMobInstance>
     private final Map<String, List<ActiveMobInstance>> activeMobs = new ConcurrentHashMap<>();
 
+    // Track cached next run: scheduleId -> ZonedDateTime
+    private final Map<String, ZonedDateTime> nextRunCache = new ConcurrentHashMap<>();
+
     // Track interval last run timestamp: scheduleId -> EpochMilli
     private final Map<String, Long> intervalLastRun = new ConcurrentHashMap<>();
 
     // Track fired warnings for next scheduled run: scheduleId -> Set of warning seconds already fired for the current target run
     private final Map<String, Set<Long>> firedWarnings = new ConcurrentHashMap<>();
-    private final Map<String, Long> nextRunEpochCache = new ConcurrentHashMap<>();
+    private long tickCounter = 0;
 
     public ScheduleManager(CappySchedulePlugin plugin) {
         this.plugin = plugin;
@@ -49,7 +52,7 @@ public class ScheduleManager {
             mainTask = null;
         }
         firedWarnings.clear();
-        nextRunEpochCache.clear();
+        nextRunCache.clear();
     }
 
     public void cleanupAllMobs() {
@@ -62,6 +65,7 @@ public class ScheduleManager {
     }
 
     private void tick() {
+        tickCounter++;
         ZoneId zone = plugin.getPluginConfig().getTimezone();
         ZonedDateTime now = ZonedDateTime.now(zone);
         long nowEpochSec = now.toEpochSecond();
@@ -69,18 +73,21 @@ public class ScheduleManager {
         for (MobSchedule schedule : plugin.getPluginConfig().getSchedules().values()) {
             if (!schedule.isEnabled()) continue;
 
-            ZonedDateTime nextRun = calculateNextRun(schedule, now);
-            if (nextRun == null) continue;
+            // Use cached next run if valid, otherwise compute and cache
+            ZonedDateTime nextRun = nextRunCache.get(schedule.getId());
+            if (nextRun == null || now.isAfter(nextRun)) {
+                nextRun = calculateNextRun(schedule, now);
+                if (nextRun != null) {
+                    nextRunCache.put(schedule.getId(), nextRun);
+                    firedWarnings.put(schedule.getId(), ConcurrentHashMap.newKeySet());
+                } else {
+                    nextRunCache.remove(schedule.getId());
+                    continue;
+                }
+            }
 
             long nextRunEpochSec = nextRun.toEpochSecond();
             long secondsUntilRun = nextRunEpochSec - nowEpochSec;
-
-            // Check if target run time has changed (reset fired warnings for new cycle)
-            Long cachedRun = nextRunEpochCache.get(schedule.getId());
-            if (cachedRun == null || !cachedRun.equals(nextRunEpochSec)) {
-                nextRunEpochCache.put(schedule.getId(), nextRunEpochSec);
-                firedWarnings.put(schedule.getId(), ConcurrentHashMap.newKeySet());
-            }
 
             // Check Warnings
             Set<Long> fired = firedWarnings.computeIfAbsent(schedule.getId(), k -> ConcurrentHashMap.newKeySet());
@@ -98,14 +105,17 @@ public class ScheduleManager {
                 if (schedule.getIntervalSeconds() != null) {
                     intervalLastRun.put(schedule.getId(), System.currentTimeMillis());
                 }
-                // Mark current run so it won't re-trigger immediately
+                // Invalidate cache so next cycle is calculated
+                nextRunCache.remove(schedule.getId());
                 fired.clear();
                 triggerSchedule(schedule, false);
             }
         }
 
-        // Clean up dead mobs from tracking
-        cleanDeadMobs();
+        // Clean dead mobs every 10 ticks (not every tick) to save CPU
+        if (tickCounter % 10 == 0) {
+            cleanDeadMobs();
+        }
     }
 
     public boolean triggerSchedule(MobSchedule schedule, boolean force) {
